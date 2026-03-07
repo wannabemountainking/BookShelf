@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct BookShelfApp: App {
+    
+    @StateObject var vm: BookViewModel = BookViewModel(provider: BookProvider.shared)
+    
     var body: some Scene {
         WindowGroup {
             MainView()
+                .environmentObject(vm)
         }
     }
 }
