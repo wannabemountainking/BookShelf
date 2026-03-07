@@ -15,7 +15,7 @@ final class BookViewModel: ObservableObject {
     let provider: BookProvider
     var context: NSManagedObjectContext
     
-    @Published var selectedBook: Book?
+    @Published var selectedBook: Book
     @Published var isNew: Bool = false
     
     init(provider: BookProvider, book: Book? = nil) {
@@ -32,14 +32,10 @@ final class BookViewModel: ObservableObject {
         }
     }
     
-    func viewModelSave() {
+    func viewModelSave() throws {
         if self.context.hasChanges {
-            do {
-                try context.save()
-                objectWillChange.send()
-            } catch {
-                print("Error Saving: \(error)")
-            }
+            try context.save()
+            objectWillChange.send()
         }
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct BookRowView: View {
     
@@ -27,14 +28,26 @@ struct BookRowView: View {
         .overlay(alignment: .topTrailing) {
             Button {
                 //TODO: isWantToRead Action
+                book.isWantToRead.toggle()
+                save()
             } label: {
-                
+                Image(systemName: book.isWantToRead ? "bookmark.fill" : "bookmark")
+                    .font(.title2)
+                    .foregroundStyle(book.isWantToRead ? Color.green.opacity(0.5) : Color.gray.opacity(0.5))
             }
-
+            .buttonStyle(.plain)
+        }
+    }
+    
+    func save() {
+        do {
+            try provider.viewContext.save()
+        } catch {
+            print("Error Saving: \(error)")
         }
     }
 }
 
-#Preview {
-    BookRowView()
-}
+//#Preview {
+//    BookRowView()
+//}

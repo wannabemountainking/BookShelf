@@ -25,23 +25,47 @@ struct MainView: View {
         
         NavigationStack {
             //sidebar
-            List {
+            ZStack {
                 if books.isEmpty {
                     NoBookView()
                 } else {
-                    ForEach(books) { book in
-                        NavigationLink {
-                            // destination
-                            CreateBookView()
-                        } label: {
-                            BookRowView()
-                        } //:NavLink
-                    } //:LOOP
-                }//:CONDITIONAL
-            } //:LIST
+                    List {
+                        ForEach(books) { book in
+                            NavigationLink {
+                                // destination
+                                BookDetailView(book: book)
+                            } label: {
+                                BookRowView(provider: provider, book: book)
+                                    .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                        Button {
+                                            //TODO: Delete Action
+                                            do {
+                                                try provider.delete(book: book, context: provider.viewContext)
+                                            } catch {
+                                                print("Error On Delete: \(error)")
+                                            }
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                                .foregroundStyle(Color.red.opacity(0.5))
+                                        }
+                                    }//: swipeActions
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button {
+                                            // TODO: Edit Action
+                                            bookToEdit = book
+                                        } label: {
+                                            Label("Edit", systemImage: "pencel")
+                                                .foregroundStyle(Color.green.opacity(0.5))
+                                        }
+                                    }
+                            } //:NavLink
+                        } //:LOOP
+                    } //:LIST
+                }//:CONDITION
+            } //:ZSTACK
             .navigationTitle("📚 BookShelf")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button {
                         // TODO: add action
                         
@@ -58,10 +82,9 @@ struct MainView: View {
                         // TODO: isWantToReadOn action
                         
                     } label: {
-                        Text("🔖")
+                        Image(systemName: isWantToReadOn ? "bookmark.fill" : "bookmark")
                             .font(.title2)
-                            .symbolVariant(.circle)
-                            .foregroundStyle(Color.accentColor.opacity(0.5))
+                            .foregroundStyle(isWantToReadOn ? Color.green.opacity(0.5) : Color.accentColor.opacity(0.5))
                     }
                 }//toolbarItem
                 
@@ -81,7 +104,9 @@ struct MainView: View {
                 //dismiss
                 dismiss()
             } content: { book in
-                BookDetailView(book: book)
+                NavigationStack {
+                    CreateBookView()
+                }
             }
         } //:NAVIGATION
     }//:body
