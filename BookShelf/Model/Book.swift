@@ -33,31 +33,34 @@ extension Book {
     }
     
     // 필터 조건
-    static func filtering(config: WantToReadConfig) -> NSPredicate {
+    static func filtering(config: BookConfig) -> NSPredicate {
         switch config.filter {
         case .all:
             return NSPredicate(value: true)
-        case .wantToBeReads:
+        case .favorites:
             return NSPredicate(format: "isWantToRead == %@", NSNumber(value: true))
         }
     }
     
     // 정렬 조건
-    static func sort(order: Sort) -> [NSSortDescriptor] {
-        [NSSortDescriptor(keyPath: \Book.title, ascending: order == .asc)]
+    static func sort(config: BookConfig) -> [NSSortDescriptor] {
+        [NSSortDescriptor(keyPath: \Book.title, ascending: config.sort == .asc)]
     }
 }
 
 
-// MARK: - 필터 조건
-struct WantToReadConfig {
+// MARK: - Configuration Pattern
+
+struct BookConfig {
     enum Filter {
-        case all, wantToBeReads
+        case all, favorites
     }
+    enum Sort {
+        case asc, dec
+    }
+    // 필터 설정
     var filter: Filter = .all
+    // 정렬 설정
+    var sort: Sort = .asc
 }
 
-// MARK: - 정렬조건
-enum Sort {
-    case asc, dec
-}

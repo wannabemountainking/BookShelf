@@ -7,13 +7,48 @@
 
 import Foundation
 import CoreData
-import Combine
 
 
 final class BookProvider {
     
-    static let shared = BookProvider()
+    static let shared: BookProvider = BookProvider()
     
+    let container: NSPersistentContainer
+    var viewContext: NSManagedObjectContext {
+        container.viewContext
+    }
     
+    var newContext: NSManagedObjectContext {
+        let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        context.persistentStoreCoordinator = container.persistentStoreCoordinator
+        return context
+    }
+    
+    private init() {
+        self.container = NSPersistentContainer(name: "BookData")
+        
+        container.loadPersistentStores { description, error in
+            if let error {
+                print("ERROR LOADING CORE DATA: \(error)")
+            } else {
+                print("SUCCESSFULLY LOADED CORE DATA: \(description)")
+            }
+        }
+    }
+    
+    func exist(context: NSManagedObjectContext, book: Book) -> Book? {
+        try? context.existingObject(with: book.objectID) as? Book
+    }
+    
+    func delete(book: Book, context: NSManagedObjectContext) throws {
+        if let existingBook = exist(context: context, book: book) {
+            context.delete(existingBook)
+            Task(priority: .background) {
+                try await context.perform {
+                    try context.save()
+                }
+            }
+        }
+    }
 }
 
