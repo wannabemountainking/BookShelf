@@ -13,13 +13,13 @@ final class BookProvider {
     
     static let shared: BookProvider = BookProvider()
     
-    let container: NSPersistentContainer
+    private let container: NSPersistentContainer
     var viewContext: NSManagedObjectContext {
         container.viewContext
     }
     
     var newContext: NSManagedObjectContext {
-        let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        let context = container.newBackgroundContext()
         context.persistentStoreCoordinator = container.persistentStoreCoordinator
         return context
     }
@@ -32,6 +32,8 @@ final class BookProvider {
                 print("ERROR LOADING CORE DATA: \(error)")
             } else {
                 print("SUCCESSFULLY LOADED CORE DATA: \(description)")
+                self.viewContext.automaticallyMergesChangesFromParent = true
+//                print("viewContext 설정됨")
             }
         }
     }

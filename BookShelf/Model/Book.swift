@@ -37,7 +37,7 @@ extension Book {
         switch config.filter {
         case .all:
             return NSPredicate(value: true)
-        case .favorites:
+        case .wantToRead:
             return NSPredicate(format: "isWantToRead == %@", NSNumber(value: true))
         }
     }
@@ -51,9 +51,9 @@ extension Book {
 
 // MARK: - Configuration Pattern
 
-struct BookConfig {
+struct BookConfig: Equatable {
     enum Filter {
-        case all, favorites
+        case all, wantToRead
     }
     enum Sort {
         case asc, dec

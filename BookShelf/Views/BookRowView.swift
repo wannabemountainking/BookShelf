@@ -15,7 +15,7 @@ struct BookRowView: View {
     
     var body: some View {
         HStack {
-            VStack {
+            VStack(alignment: .leading) {
                 Text(book.title)
                     .font(.title2)
                     .fontWeight(.ultraLight)
@@ -42,6 +42,7 @@ struct BookRowView: View {
     func save() {
         do {
             try provider.viewContext.save()
+            print(book.isWantToRead)
         } catch {
             print("Error Saving: \(error)")
         }
